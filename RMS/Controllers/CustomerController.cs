@@ -14,6 +14,31 @@ namespace RMS.Controllers
             _db = db;
         }
 
+        private bool CustomerExists(string customerName, string customerPhone, string excludeId = null)
+        {
+            string sql = @"
+                SELECT COUNT(*)
+                FROM CUSTOMER_3NF
+                WHERE UPPER(TRIM(CUSTOMER_NAME)) = UPPER(TRIM(:CUSTOMER_NAME))
+                  AND TRIM(CUSTOMER_PHONE) = TRIM(:CUSTOMER_PHONE)";
+
+            if (!string.IsNullOrEmpty(excludeId))
+            {
+                sql += " AND CUSTOMER_ID <> :EXCLUDE_ID";
+                var dt2 = _db.Query(sql,
+                    new OracleParameter("CUSTOMER_NAME", customerName),
+                    new OracleParameter("CUSTOMER_PHONE", customerPhone),
+                    new OracleParameter("EXCLUDE_ID", excludeId));
+                return Convert.ToInt32(dt2.Rows[0][0]) > 0;
+            }
+
+            var dt = _db.Query(sql,
+                new OracleParameter("CUSTOMER_NAME", customerName),
+                new OracleParameter("CUSTOMER_PHONE", customerPhone));
+
+            return Convert.ToInt32(dt.Rows[0][0]) > 0;
+        }
+
         public IActionResult Index()
         {
             var dt = _db.Query(@"
@@ -21,7 +46,6 @@ namespace RMS.Controllers
                 FROM CUSTOMER_3NF
                 ORDER BY CUSTOMER_ID
             ");
-
             return View(dt);
         }
 
@@ -31,6 +55,12 @@ namespace RMS.Controllers
         {
             try
             {
+                if (CustomerExists(customerName, customerPhone))
+                {
+                    TempData["ErrorMessage"] = "Duplicate customer is not allowed.";
+                    return RedirectToAction("Index");
+                }
+
                 _db.Execute(@"
                     INSERT INTO CUSTOMER_3NF (CUSTOMER_ID, CUSTOMER_NAME, CUSTOMER_ADDRESS, CUSTOMER_PHONE)
                     VALUES (:CUSTOMER_ID, :CUSTOMER_NAME, :CUSTOMER_ADDRESS, :CUSTOMER_PHONE)
@@ -56,6 +86,12 @@ namespace RMS.Controllers
         {
             try
             {
+                if (CustomerExists(customerName, customerPhone, customerId))
+                {
+                    TempData["ErrorMessage"] = "Another customer with the same name and phone already exists.";
+                    return RedirectToAction("Index");
+                }
+
                 _db.Execute(@"
                     UPDATE CUSTOMER_3NF
                     SET CUSTOMER_NAME = :CUSTOMER_NAME,
@@ -84,11 +120,8 @@ namespace RMS.Controllers
         {
             try
             {
-                _db.Execute(@"
-                    DELETE FROM CUSTOMER_3NF
-                    WHERE CUSTOMER_ID = :CUSTOMER_ID
-                ",
-                new OracleParameter("CUSTOMER_ID", customerId));
+                _db.Execute("DELETE FROM CUSTOMER_3NF WHERE CUSTOMER_ID = :CUSTOMER_ID",
+                    new OracleParameter("CUSTOMER_ID", customerId));
 
                 TempData["SuccessMessage"] = "Customer deleted successfully.";
             }

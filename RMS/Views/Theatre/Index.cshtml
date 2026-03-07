@@ -1,51 +1,332 @@
 ﻿@model System.Data.DataTable
 @{
-    ViewData["Title"] = "Theatres";
+    ViewData["Title"] = "Theatre Management";
 }
 
-<h2>Theatre Details</h2>
+<style>
+    :root {
+        --bg: #f6f8fb;
+        --surface: #fff;
+        --border: #e5e7eb;
+        --border-dark: #d1d5db;
+        --text: #111827;
+        --text-soft: #6b7280;
+        --secondary: #475569;
+        --hover: #f9fafb;
+        --edit-bg: #f8fafc;
+        --success: #f0fdf4;
+        --danger: #fef2f2;
+        --shadow: 0 10px 30px rgba(15,23,42,0.06);
+        --radius: 18px;
+    }
 
-<div class="card mb-3">
-    <div class="card-body">
-        <form method="post" asp-action="Create" class="row g-2">
-            <div class="col-md-3"><input class="form-control" name="theatreId" placeholder="Theatre ID" required /></div>
-            <div class="col-md-4"><input class="form-control" name="theatreName" placeholder="Theatre Name" required /></div>
-            <div class="col-md-3"><input class="form-control" name="theatreCity" placeholder="Theatre City" required /></div>
-            <div class="col-12"><button class="btn btn-success" type="submit">Add Theatre</button></div>
-        </form>
+    body {
+        background: var(--bg);
+    }
+
+    .page-shell {
+        padding: 8px 0 20px;
+    }
+
+    .page-header, .panel, .table-panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+    }
+
+    .page-header {
+        border-radius: 24px;
+        padding: 28px 30px;
+        margin-bottom: 26px;
+    }
+
+        .page-header h2 {
+            margin: 0;
+            font-size: 29px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .page-header p {
+            margin: 8px 0 0;
+            color: var(--text-soft);
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+    .panel {
+        border-radius: var(--radius);
+        margin-bottom: 24px;
+    }
+
+    .panel-body {
+        padding: 24px;
+    }
+
+    .panel-title {
+        margin: 0 0 18px;
+        color: var(--text);
+        font-size: 20px;
+        font-weight: 650;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--secondary);
+        margin-bottom: 7px;
+        font-size: 14px;
+    }
+
+    .form-control {
+        border-radius: 12px;
+        border: 1px solid var(--border-dark);
+        min-height: 44px;
+        padding: 10px 14px;
+    }
+
+        .form-control:focus {
+            border-color: #94a3b8;
+            box-shadow: 0 0 0 .2rem rgba(148,163,184,.15);
+        }
+
+    .btn {
+        border-radius: 12px;
+        font-weight: 600;
+        padding: 10px 16px;
+    }
+
+    .btn-add, .btn-save {
+        background: #1f2937;
+        color: #fff;
+    }
+
+        .btn-add:hover, .btn-save:hover {
+            background: #111827;
+            color: #fff;
+        }
+
+    .btn-edit, .btn-cancel {
+        background: #fff;
+        color: #334155;
+        border: 1px solid #cbd5e1;
+    }
+
+        .btn-edit:hover, .btn-cancel:hover {
+            background: #f8fafc;
+            color: #111827;
+        }
+
+    .btn-delete {
+        background: #fff;
+        color: #7f1d1d;
+        border: 1px solid #fecaca;
+    }
+
+        .btn-delete:hover {
+            background: #fef2f2;
+            color: #7f1d1d;
+        }
+
+    .utility-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+    }
+
+        .utility-bar h4 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 650;
+            color: var(--text);
+        }
+
+    .search-box {
+        max-width: 320px;
+    }
+
+    .table-panel {
+        border-radius: var(--radius);
+        overflow: hidden;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+        .table thead th {
+            background: #f8fafc;
+            color: #374151;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table tbody td {
+            padding: 16px;
+            vertical-align: middle;
+            color: var(--text);
+            border-color: #eef2f7;
+        }
+
+        .table tbody tr:hover {
+            background: var(--hover);
+        }
+
+    .item-id {
+        font-weight: 700;
+        color: #334155;
+    }
+
+    .action-group {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .edit-row {
+        background: var(--edit-bg) !important;
+    }
+
+    .alert {
+        border-radius: 14px;
+        box-shadow: var(--shadow);
+    }
+
+    .alert-success {
+        background: var(--success);
+        border: 1px solid #bbf7d0;
+        color: #166534;
+    }
+
+    .alert-danger {
+        background: var(--danger);
+        border: 1px solid #fecaca;
+        color: #991b1b;
+    }
+
+    .empty-row {
+        text-align: center;
+        color: var(--text-soft);
+        padding: 24px !important;
+    }
+</style>
+
+<div class="page-shell">
+    <div class="page-header">
+        <h2>Theatre Management</h2>
+        <p>Add, search, edit, and delete theatre records from one page.</p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mb-4">@TempData["SuccessMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show mb-4">@TempData["ErrorMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
+    }
+
+    <div class="panel">
+        <div class="panel-body">
+            <h4 class="panel-title">Add New Theatre</h4>
+            <form method="post" asp-action="Create" class="row g-3">
+                @Html.AntiForgeryToken()
+                <div class="col-md-3"><label class="form-label">Theatre ID</label><input type="text" name="theatreId" class="form-control" required /></div>
+                <div class="col-md-5"><label class="form-label">Theatre Name</label><input type="text" name="theatreName" class="form-control" required /></div>
+                <div class="col-md-4"><label class="form-label">Theatre City</label><input type="text" name="theatreCity" class="form-control" required /></div>
+                <div class="col-12"><button type="submit" class="btn btn-add">Add Theatre</button></div>
+            </form>
+        </div>
+    </div>
+
+    <div class="utility-bar">
+        <h4>Theatre Records</h4>
+        <input type="text" id="theatreSearch" class="form-control search-box" placeholder="Search theatre..." />
+    </div>
+
+    <div class="table-panel">
+        <table class="table align-middle" id="theatreTable">
+            <thead>
+                <tr>
+                    <th>Theatre ID</th>
+                    <th>Theatre Name</th>
+                    <th>City</th>
+                    <th style="width:250px;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Rows.Count > 0)
+                {
+                    @foreach (System.Data.DataRow row in Model.Rows)
+                    {
+                        var id = row["THEATRE_ID"].ToString();
+                        var name = row["THEATRE_NAME"].ToString();
+                        var city = row["THEATRE_CITY"].ToString();
+
+                        <tr id="viewRow_@id">
+                            <td class="item-id">@id</td>
+                            <td>@name</td>
+                            <td>@city</td>
+                            <td>
+                                <div class="action-group">
+                                    <button type="button" class="btn btn-edit btn-sm" onclick="enableEdit('@id')">Edit</button>
+                                    <form method="post" asp-action="Delete" style="display:inline;" onsubmit="return confirm('Delete this theatre?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="theatreId" value="@id" />
+                                        <button type="submit" class="btn btn-delete btn-sm">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr id="editRow_@id" class="edit-row" style="display:none;">
+                            <td colspan="4">
+                                <form method="post" asp-action="Update" class="row g-3 align-items-end">
+                                    @Html.AntiForgeryToken()
+                                    <div class="col-md-2"><label class="form-label">ID</label><input type="text" name="theatreId" value="@id" class="form-control" readonly /></div>
+                                    <div class="col-md-5"><label class="form-label">Theatre Name</label><input type="text" name="theatreName" value="@name" class="form-control" required /></div>
+                                    <div class="col-md-3"><label class="form-label">City</label><input type="text" name="theatreCity" value="@city" class="form-control" required /></div>
+                                    <div class="col-md-2">
+                                        <div class="action-group mt-2">
+                                            <button type="submit" class="btn btn-save btn-sm">Save</button>
+                                            <button type="button" class="btn btn-cancel btn-sm" onclick="cancelEdit('@id')">Cancel</button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="4" class="empty-row">No theatre records found.</td></tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
 
-<table class="table table-bordered table-striped">
-    <thead class="table-dark">
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>City</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (System.Data.DataRow row in Model.Rows)
-        {
-            <tr>
-                <td>@row["THEATRE_ID"]</td>
-                <td>@row["THEATRE_NAME"]</td>
-                <td>@row["THEATRE_CITY"]</td>
-                <td>
-                    <form method="post" asp-action="Delete" style="display:inline;">
-                        <input type="hidden" name="theatreId" value="@row["THEATRE_ID"]" />
-                        <button class="btn btn-danger btn-sm">Delete</button>
-                    </form>
-
-                    <form method="post" asp-action="Update" class="mt-2">
-                        <input type="hidden" name="theatreId" value="@row["THEATRE_ID"]" />
-                        <input name="theatreName" value="@row["THEATRE_NAME"]" class="form-control form-control-sm mb-1" />
-                        <input name="theatreCity" value="@row["THEATRE_CITY"]" class="form-control form-control-sm mb-1" />
-                        <button class="btn btn-primary btn-sm">Save</button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<script>
+    function enableEdit(id) {
+        document.getElementById("viewRow_" + id).style.display = "none";
+        document.getElementById("editRow_" + id).style.display = "";
+    }
+    function cancelEdit(id) {
+        document.getElementById("editRow_" + id).style.display = "none";
+        document.getElementById("viewRow_" + id).style.display = "";
+    }
+    document.getElementById("theatreSearch").addEventListener("keyup", function () {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll("#theatreTable tbody tr");
+        rows.forEach(row => {
+            let text = row.innerText.toLowerCase();
+            row.style.display = text.includes(filter) ? "" : "none";
+        });
+    });
+</script>

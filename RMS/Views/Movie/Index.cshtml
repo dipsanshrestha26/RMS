@@ -7,19 +7,17 @@
 <style>
     :root {
         --bg: #f6f8fb;
-        --surface: #ffffff;
-        --surface-soft: #f8fafc;
+        --surface: #fff;
         --border: #e5e7eb;
         --border-dark: #d1d5db;
         --text: #111827;
         --text-soft: #6b7280;
-        --primary: #1f2937;
         --secondary: #475569;
         --hover: #f9fafb;
         --edit-bg: #f8fafc;
         --success: #f0fdf4;
         --danger: #fef2f2;
-        --shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+        --shadow: 0 10px 30px rgba(15,23,42,0.06);
         --radius: 18px;
     }
 
@@ -31,13 +29,16 @@
         padding: 8px 0 20px;
     }
 
-    .page-header {
-        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    .page-header, .panel, .table-panel {
+        background: var(--surface);
         border: 1px solid var(--border);
+        box-shadow: var(--shadow);
+    }
+
+    .page-header {
         border-radius: 24px;
         padding: 28px 30px;
         margin-bottom: 26px;
-        box-shadow: var(--shadow);
     }
 
         .page-header h2 {
@@ -45,7 +46,6 @@
             font-size: 29px;
             font-weight: 700;
             color: var(--text);
-            letter-spacing: -0.02em;
         }
 
         .page-header p {
@@ -56,10 +56,7 @@
         }
 
     .panel {
-        background: var(--surface);
-        border: 1px solid var(--border);
         border-radius: var(--radius);
-        box-shadow: var(--shadow);
         margin-bottom: 24px;
     }
 
@@ -86,40 +83,36 @@
         border: 1px solid var(--border-dark);
         min-height: 44px;
         padding: 10px 14px;
-        color: var(--text);
-        background: #fff;
     }
 
         .form-control:focus {
             border-color: #94a3b8;
-            box-shadow: 0 0 0 0.2rem rgba(148, 163, 184, 0.15);
+            box-shadow: 0 0 0 .2rem rgba(148,163,184,.15);
         }
 
     .btn {
         border-radius: 12px;
         font-weight: 600;
         padding: 10px 16px;
-        border: 1px solid transparent;
-        transition: all 0.2s ease;
     }
 
-    .btn-add {
+    .btn-add, .btn-save {
         background: #1f2937;
         color: #fff;
     }
 
-        .btn-add:hover {
+        .btn-add:hover, .btn-save:hover {
             background: #111827;
             color: #fff;
         }
 
-    .btn-edit {
+    .btn-edit, .btn-cancel {
         background: #fff;
         color: #334155;
-        border-color: #cbd5e1;
+        border: 1px solid #cbd5e1;
     }
 
-        .btn-edit:hover {
+        .btn-edit:hover, .btn-cancel:hover {
             background: #f8fafc;
             color: #111827;
         }
@@ -127,33 +120,12 @@
     .btn-delete {
         background: #fff;
         color: #7f1d1d;
-        border-color: #fecaca;
+        border: 1px solid #fecaca;
     }
 
         .btn-delete:hover {
             background: #fef2f2;
             color: #7f1d1d;
-        }
-
-    .btn-save {
-        background: #1f2937;
-        color: white;
-    }
-
-        .btn-save:hover {
-            background: #111827;
-            color: white;
-        }
-
-    .btn-cancel {
-        background: #fff;
-        color: #475569;
-        border-color: #cbd5e1;
-    }
-
-        .btn-cancel:hover {
-            background: #f8fafc;
-            color: #1f2937;
         }
 
     .utility-bar {
@@ -177,10 +149,7 @@
     }
 
     .table-panel {
-        background: var(--surface);
-        border: 1px solid var(--border);
         border-radius: var(--radius);
-        box-shadow: var(--shadow);
         overflow: hidden;
     }
 
@@ -194,11 +163,9 @@
             font-weight: 700;
             font-size: 13px;
             text-transform: uppercase;
-            letter-spacing: 0.06em;
+            letter-spacing: .06em;
             padding: 16px;
             border-bottom: 1px solid var(--border);
-            border-top: none;
-            white-space: nowrap;
         }
 
         .table tbody td {
@@ -212,7 +179,7 @@
             background: var(--hover);
         }
 
-    .movie-id {
+    .item-id {
         font-weight: 700;
         color: #334155;
     }
@@ -227,25 +194,20 @@
         background: var(--edit-bg) !important;
     }
 
-    .inline-input {
-        min-width: 120px;
-    }
-
     .alert {
         border-radius: 14px;
-        border: 1px solid transparent;
         box-shadow: var(--shadow);
     }
 
     .alert-success {
         background: var(--success);
-        border-color: #bbf7d0;
+        border: 1px solid #bbf7d0;
         color: #166534;
     }
 
     .alert-danger {
         background: var(--danger);
-        border-color: #fecaca;
+        border: 1px solid #fecaca;
         color: #991b1b;
     }
 
@@ -254,87 +216,35 @@
         color: var(--text-soft);
         padding: 24px !important;
     }
-
-    @@media (max-width: 768px) {
-        .page-header {
-            padding: 24px;
-        }
-
-            .page-header h2 {
-                font-size: 24px;
-            }
-
-        .panel-body {
-            padding: 20px;
-        }
-    }
 </style>
 
 <div class="page-shell">
     <div class="page-header">
         <h2>Movie Management</h2>
-        <p>
-            Manage movie records in a clean and user-friendly interface.
-            Add new movies, edit records directly in the table, and delete entries when necessary.
-        </p>
+        <p>Add, search, edit, and delete movie records from one page.</p>
     </div>
 
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-            @TempData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+        <div class="alert alert-success alert-dismissible fade show mb-4">@TempData["SuccessMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
     }
-
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
-            @TempData["ErrorMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
+        <div class="alert alert-danger alert-dismissible fade show mb-4">@TempData["ErrorMessage"]<button type="button" class="btn-close" data-bs-dismiss="alert"></button></div>
     }
 
     <div class="panel">
         <div class="panel-body">
             <h4 class="panel-title">Add New Movie</h4>
-
             <form method="post" asp-action="Create" class="row g-3">
                 @Html.AntiForgeryToken()
-
-                <div class="col-md-2">
-                    <label class="form-label">Movie ID</label>
-                    <input type="text" name="movieId" class="form-control" placeholder="Enter movie ID" required />
-                </div>
-
-                <div class="col-md-3">
-                    <label class="form-label">Movie Title</label>
-                    <input type="text" name="movieTitle" class="form-control" placeholder="Enter movie title" required />
-                </div>
-
-                <div class="col-md-2">
-                    <label class="form-label">Genre</label>
-                    <input type="text" name="movieGenre" class="form-control" placeholder="Enter genre" required />
-                </div>
-
-                <div class="col-md-2">
-                    <label class="form-label">Language</label>
-                    <input type="text" name="movieLanguage" class="form-control" placeholder="Enter language" required />
-                </div>
-
-                <div class="col-md-1">
-                    <label class="form-label">Duration</label>
-                    <input type="text" name="movieDuration" class="form-control" placeholder="120" required />
-                </div>
-
-                <div class="col-md-2">
-                    <label class="form-label">Release Date</label>
-                    <input type="date" name="releaseDate" class="form-control" required />
-                </div>
-
-                <div class="col-12 mt-2">
-                    <button type="submit" class="btn btn-add">Add Movie</button>
-                </div>
+                <div class="col-md-2"><label class="form-label">Movie ID</label><input type="text" name="movieId" class="form-control" required /></div>
+                <div class="col-md-3"><label class="form-label">Movie Title</label><input type="text" name="movieTitle" class="form-control" required /></div>
+                <div class="col-md-2"><label class="form-label">Genre</label><input type="text" name="movieGenre" class="form-control" required /></div>
+                <div class="col-md-2"><label class="form-label">Language</label><input type="text" name="movieLanguage" class="form-control" required /></div>
+                <div class="col-md-1"><label class="form-label">Duration</label><input type="text" name="movieDuration" class="form-control" required /></div>
+                <div class="col-md-2"><label class="form-label">Release Date</label><input type="date" name="releaseDate" class="form-control" required /></div>
+                <div class="col-12"><button type="submit" class="btn btn-add">Add Movie</button></div>
             </form>
         </div>
     </div>
@@ -348,13 +258,13 @@
         <table class="table align-middle" id="movieTable">
             <thead>
                 <tr>
-                    <th style="width: 100px;">Movie ID</th>
-                    <th>Movie Title</th>
+                    <th>Movie ID</th>
+                    <th>Title</th>
                     <th>Genre</th>
                     <th>Language</th>
                     <th>Duration</th>
                     <th>Release Date</th>
-                    <th style="width: 240px;">Action</th>
+                    <th style="width:250px;">Action</th>
                 </tr>
             </thead>
             <tbody>
@@ -367,23 +277,21 @@
                         var genre = row["MOVIE_GENRE"].ToString();
                         var language = row["MOVIE_LANGUAGE"].ToString();
                         var duration = row["MOVIE_DURATION"].ToString();
-
                         DateTime releaseDate = Convert.ToDateTime(row["RELEASE_DATE"]);
-                        string releaseDateDisplay = releaseDate.ToString("dd/MM/yyyy");
-                        string releaseDateInput = releaseDate.ToString("yyyy-MM-dd");
+                        string displayDate = releaseDate.ToString("dd/MM/yyyy");
+                        string inputDate = releaseDate.ToString("yyyy-MM-dd");
 
                         <tr id="viewRow_@id">
-                            <td class="movie-id">@id</td>
+                            <td class="item-id">@id</td>
                             <td>@title</td>
                             <td>@genre</td>
                             <td>@language</td>
                             <td>@duration</td>
-                            <td>@releaseDateDisplay</td>
+                            <td>@displayDate</td>
                             <td>
                                 <div class="action-group">
                                     <button type="button" class="btn btn-edit btn-sm" onclick="enableEdit('@id')">Edit</button>
-
-                                    <form method="post" asp-action="Delete" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this movie?');">
+                                    <form method="post" asp-action="Delete" style="display:inline;" onsubmit="return confirm('Delete this movie?');">
                                         @Html.AntiForgeryToken()
                                         <input type="hidden" name="movieId" value="@id" />
                                         <button type="submit" class="btn btn-delete btn-sm">Delete</button>
@@ -396,37 +304,12 @@
                             <td colspan="7">
                                 <form method="post" asp-action="Update" class="row g-3 align-items-end">
                                     @Html.AntiForgeryToken()
-
-                                    <div class="col-md-1">
-                                        <label class="form-label">ID</label>
-                                        <input type="text" name="movieId" value="@id" class="form-control inline-input" readonly />
-                                    </div>
-
-                                    <div class="col-md-3">
-                                        <label class="form-label">Title</label>
-                                        <input type="text" name="movieTitle" value="@title" class="form-control inline-input" required />
-                                    </div>
-
-                                    <div class="col-md-2">
-                                        <label class="form-label">Genre</label>
-                                        <input type="text" name="movieGenre" value="@genre" class="form-control inline-input" required />
-                                    </div>
-
-                                    <div class="col-md-2">
-                                        <label class="form-label">Language</label>
-                                        <input type="text" name="movieLanguage" value="@language" class="form-control inline-input" required />
-                                    </div>
-
-                                    <div class="col-md-2">
-                                        <label class="form-label">Duration</label>
-                                        <input type="text" name="movieDuration" value="@duration" class="form-control inline-input" required />
-                                    </div>
-
-                                    <div class="col-md-2">
-                                        <label class="form-label">Release Date</label>
-                                        <input type="date" name="releaseDate" value="@releaseDateInput" class="form-control inline-input" required />
-                                    </div>
-
+                                    <div class="col-md-1"><label class="form-label">ID</label><input type="text" name="movieId" value="@id" class="form-control" readonly /></div>
+                                    <div class="col-md-3"><label class="form-label">Title</label><input type="text" name="movieTitle" value="@title" class="form-control" required /></div>
+                                    <div class="col-md-2"><label class="form-label">Genre</label><input type="text" name="movieGenre" value="@genre" class="form-control" required /></div>
+                                    <div class="col-md-2"><label class="form-label">Language</label><input type="text" name="movieLanguage" value="@language" class="form-control" required /></div>
+                                    <div class="col-md-2"><label class="form-label">Duration</label><input type="text" name="movieDuration" value="@duration" class="form-control" required /></div>
+                                    <div class="col-md-2"><label class="form-label">Release Date</label><input type="date" name="releaseDate" value="@inputDate" class="form-control" required /></div>
                                     <div class="col-12">
                                         <div class="action-group mt-2">
                                             <button type="submit" class="btn btn-save btn-sm">Save</button>
@@ -440,9 +323,7 @@
                 }
                 else
                 {
-                    <tr>
-                        <td colspan="7" class="empty-row">No movie records found.</td>
-                    </tr>
+                    <tr><td colspan="7" class="empty-row">No movie records found.</td></tr>
                 }
             </tbody>
         </table>
@@ -454,16 +335,13 @@
         document.getElementById("viewRow_" + id).style.display = "none";
         document.getElementById("editRow_" + id).style.display = "";
     }
-
     function cancelEdit(id) {
         document.getElementById("editRow_" + id).style.display = "none";
         document.getElementById("viewRow_" + id).style.display = "";
     }
-
     document.getElementById("movieSearch").addEventListener("keyup", function () {
         let filter = this.value.toLowerCase();
         let rows = document.querySelectorAll("#movieTable tbody tr");
-
         rows.forEach(row => {
             let text = row.innerText.toLowerCase();
             row.style.display = text.includes(filter) ? "" : "none";
