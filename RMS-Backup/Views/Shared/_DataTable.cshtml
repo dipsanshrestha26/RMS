@@ -1,0 +1,32 @@
+﻿@model System.Data.DataTable
+
+@if (Model == null || Model.Rows.Count == 0)
+{
+    <div class="alert alert-warning">No results found.</div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    @foreach (System.Data.DataColumn c in Model.Columns)
+                    {
+                        <th>@c.ColumnName</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (System.Data.DataRow r in Model.Rows)
+                {
+                    <tr>
+                        @foreach (var item in r.ItemArray)
+                        {
+                            <td>@item</td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

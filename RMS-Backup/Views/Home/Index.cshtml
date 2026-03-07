@@ -1,0 +1,203 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<style>
+    :root {
+        --bg: #f6f8fb;
+        --surface: #ffffff;
+        --surface-soft: #f9fafb;
+        --border: #e5e7eb;
+        --text: #111827;
+        --text-muted: #6b7280;
+        --primary: #334155;
+        --accent: #64748b;
+        --shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+        --radius: 18px;
+    }
+
+    body {
+        background: var(--bg);
+    }
+
+    .dashboard-shell {
+        padding: 8px 0 20px;
+    }
+
+    .dashboard-header {
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 30px 32px;
+        margin-bottom: 28px;
+        box-shadow: var(--shadow);
+    }
+
+        .dashboard-header h2 {
+            margin: 0;
+            font-size: 30px;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.02em;
+        }
+
+        .dashboard-header p {
+            margin: 10px 0 0;
+            color: var(--text-muted);
+            font-size: 15px;
+            max-width: 760px;
+            line-height: 1.7;
+        }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 20px;
+    }
+
+    .stat-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 22px;
+        box-shadow: var(--shadow);
+        transition: all 0.22s ease;
+        min-height: 145px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            border-color: #cbd5e1;
+        }
+
+    .stat-label {
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 14px;
+    }
+
+    .stat-value {
+        font-size: 36px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1;
+        margin-bottom: 14px;
+    }
+
+    .stat-line {
+        width: 48px;
+        height: 3px;
+        background: #cbd5e1;
+        border-radius: 999px;
+    }
+
+    .dashboard-footer-note {
+        margin-top: 24px;
+        color: var(--text-muted);
+        font-size: 14px;
+        text-align: right;
+    }
+
+    @@media (max-width: 1200px) {
+        .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .dashboard-header {
+            padding: 24px;
+        }
+
+            .dashboard-header h2 {
+                font-size: 24px;
+            }
+
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .stat-value {
+            font-size: 30px;
+        }
+    }
+</style>
+
+<div class="dashboard-shell">
+    <div class="dashboard-header">
+        <h2>Retail Management System Dashboard</h2>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div>
+                <div class="stat-label">Total Customers</div>
+                <div class="stat-value">@ViewBag.TotalCustomers</div>
+            </div>
+            <div class="stat-line"></div>
+        </div>
+
+        <div class="stat-card">
+            <div>
+                <div class="stat-label">Total Movies</div>
+                <div class="stat-value">@ViewBag.TotalMovies</div>
+            </div>
+            <div class="stat-line"></div>
+        </div>
+
+        <div class="stat-card">
+            <div>
+                <div class="stat-label">Total Theatres</div>
+                <div class="stat-value">@ViewBag.TotalTheatres</div>
+            </div>
+            <div class="stat-line"></div>
+        </div>
+
+        <div class="stat-card">
+            <div>
+                <div class="stat-label">Total Halls</div>
+                <div class="stat-value">@ViewBag.TotalHalls</div>
+            </div>
+            <div class="stat-line"></div>
+        </div>
+
+        <div class="stat-card">
+            <div>
+                <div class="stat-label">Total Shows</div>
+                <div class="stat-value">@ViewBag.TotalShows</div>
+            </div>
+            <div class="stat-line"></div>
+        </div>
+
+        <div class="stat-card">
+            <div>
+                <div class="stat-label">Total Tickets</div>
+                <div class="stat-value">@ViewBag.TotalTickets</div>
+            </div>
+            <div class="stat-line"></div>
+        </div>
+
+        <div class="stat-card">
+            <div>
+                <div class="stat-label">Total Payments</div>
+                <div class="stat-value">@ViewBag.TotalPayments</div>
+            </div>
+            <div class="stat-line"></div>
+        </div>
+
+        <div class="stat-card">
+            <div>
+                <div class="stat-label">Paid Payments</div>
+                <div class="stat-value">@ViewBag.PaidPayments</div>
+            </div>
+            <div class="stat-line"></div>
+        </div>
+    </div>
+
+</div>
