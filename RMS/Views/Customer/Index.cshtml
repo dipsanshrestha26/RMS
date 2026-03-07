@@ -1,55 +1,430 @@
 ﻿@model System.Data.DataTable
 @{
-    ViewData["Title"] = "Customers";
+    ViewData["Title"] = "Customer Management";
 }
 
-<h2>Customer Details</h2>
+<style>
+    :root {
+        --bg: #f6f8fb;
+        --surface: #ffffff;
+        --surface-soft: #f8fafc;
+        --border: #e5e7eb;
+        --border-dark: #d1d5db;
+        --text: #111827;
+        --text-soft: #6b7280;
+        --primary: #1f2937;
+        --secondary: #475569;
+        --hover: #f9fafb;
+        --edit-bg: #f8fafc;
+        --success: #f0fdf4;
+        --danger: #fef2f2;
+        --shadow: 0 10px 30px rgba(15, 23, 42, 0.06);
+        --radius: 18px;
+    }
 
-<div class="card mb-3">
-    <div class="card-body">
-        <form method="post" asp-action="Create" class="row g-2">
-            <div class="col-md-2"><input class="form-control" name="customerId" placeholder="Customer ID" required /></div>
-            <div class="col-md-3"><input class="form-control" name="customerName" placeholder="Customer Name" required /></div>
-            <div class="col-md-4"><input class="form-control" name="customerAddress" placeholder="Customer Address" required /></div>
-            <div class="col-md-3"><input class="form-control" name="customerPhone" placeholder="Customer Phone" required /></div>
-            <div class="col-12"><button class="btn btn-success" type="submit">Add Customer</button></div>
-        </form>
+    body {
+        background: var(--bg);
+    }
+
+    .page-shell {
+        padding: 8px 0 20px;
+    }
+
+    .page-header {
+        background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        border: 1px solid var(--border);
+        border-radius: 24px;
+        padding: 28px 30px;
+        margin-bottom: 26px;
+        box-shadow: var(--shadow);
+    }
+
+        .page-header h2 {
+            margin: 0;
+            font-size: 29px;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.02em;
+        }
+
+        .page-header p {
+            margin: 8px 0 0;
+            color: var(--text-soft);
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+    .panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        margin-bottom: 24px;
+    }
+
+    .panel-body {
+        padding: 24px;
+    }
+
+    .panel-title {
+        margin: 0 0 18px;
+        color: var(--text);
+        font-size: 20px;
+        font-weight: 650;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: var(--secondary);
+        margin-bottom: 7px;
+        font-size: 14px;
+    }
+
+    .form-control {
+        border-radius: 12px;
+        border: 1px solid var(--border-dark);
+        min-height: 44px;
+        padding: 10px 14px;
+        color: var(--text);
+        background: #fff;
+    }
+
+        .form-control:focus {
+            border-color: #94a3b8;
+            box-shadow: 0 0 0 0.2rem rgba(148, 163, 184, 0.15);
+        }
+
+    .btn {
+        border-radius: 12px;
+        font-weight: 600;
+        padding: 10px 16px;
+        border: 1px solid transparent;
+        transition: all 0.2s ease;
+    }
+
+    .btn-add {
+        background: #1f2937;
+        color: #fff;
+    }
+
+        .btn-add:hover {
+            background: #111827;
+            color: #fff;
+        }
+
+    .btn-edit {
+        background: #fff;
+        color: #334155;
+        border-color: #cbd5e1;
+    }
+
+        .btn-edit:hover {
+            background: #f8fafc;
+            color: #111827;
+        }
+
+    .btn-delete {
+        background: #fff;
+        color: #7f1d1d;
+        border-color: #fecaca;
+    }
+
+        .btn-delete:hover {
+            background: #fef2f2;
+            color: #7f1d1d;
+        }
+
+    .btn-save {
+        background: #1f2937;
+        color: white;
+    }
+
+        .btn-save:hover {
+            background: #111827;
+            color: white;
+        }
+
+    .btn-cancel {
+        background: #fff;
+        color: #475569;
+        border-color: #cbd5e1;
+    }
+
+        .btn-cancel:hover {
+            background: #f8fafc;
+            color: #1f2937;
+        }
+
+    .utility-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+    }
+
+        .utility-bar h4 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 650;
+            color: var(--text);
+        }
+
+    .search-box {
+        max-width: 320px;
+    }
+
+    .table-panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+    }
+
+    .table {
+        margin-bottom: 0;
+    }
+
+        .table thead th {
+            background: #f8fafc;
+            color: #374151;
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            border-top: none;
+        }
+
+        .table tbody td {
+            padding: 16px;
+            vertical-align: middle;
+            color: var(--text);
+            border-color: #eef2f7;
+        }
+
+        .table tbody tr:hover {
+            background: var(--hover);
+        }
+
+    .customer-id {
+        font-weight: 700;
+        color: #334155;
+    }
+
+    .action-group {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .edit-row {
+        background: var(--edit-bg) !important;
+    }
+
+    .inline-input {
+        min-width: 140px;
+    }
+
+    .alert {
+        border-radius: 14px;
+        border: 1px solid transparent;
+        box-shadow: var(--shadow);
+    }
+
+    .alert-success {
+        background: var(--success);
+        border-color: #bbf7d0;
+        color: #166534;
+    }
+
+    .alert-danger {
+        background: var(--danger);
+        border-color: #fecaca;
+        color: #991b1b;
+    }
+
+    .empty-row {
+        text-align: center;
+        color: var(--text-soft);
+        padding: 24px !important;
+    }
+
+    @@media (max-width: 768px) {
+        .page-header {
+            padding: 24px;
+        }
+
+            .page-header h2 {
+                font-size: 24px;
+            }
+
+        .panel-body {
+            padding: 20px;
+        }
+    }
+</style>
+
+<div class="page-shell">
+    <div class="page-header">
+        <h2>Customer Management</h2>
+        <p>
+            Manage customer records through a clean and accessible interface.
+            Add new entries, edit customer details directly in the table, and remove records when needed.
+        </p>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+            @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="panel">
+        <div class="panel-body">
+            <h4 class="panel-title">Add New Customer</h4>
+
+            <form method="post" asp-action="Create" class="row g-3">
+                @Html.AntiForgeryToken()
+
+                <div class="col-md-3">
+                    <label class="form-label">Customer ID</label>
+                    <input type="text" name="customerId" class="form-control" placeholder="Enter customer ID" required />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Customer Name</label>
+                    <input type="text" name="customerName" class="form-control" placeholder="Enter customer name" required />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Customer Address</label>
+                    <input type="text" name="customerAddress" class="form-control" placeholder="Enter customer address" required />
+                </div>
+
+                <div class="col-md-3">
+                    <label class="form-label">Customer Phone</label>
+                    <input type="text" name="customerPhone" class="form-control" placeholder="Enter customer phone" required />
+                </div>
+
+                <div class="col-12 mt-2">
+                    <button type="submit" class="btn btn-add">Add Customer</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="utility-bar">
+        <h4>Customer Records</h4>
+        <input type="text" id="customerSearch" class="form-control search-box" placeholder="Search customer..." />
+    </div>
+
+    <div class="table-panel">
+        <table class="table align-middle" id="customerTable">
+            <thead>
+                <tr>
+                    <th style="width: 120px;">Customer ID</th>
+                    <th>Customer Name</th>
+                    <th>Customer Address</th>
+                    <th>Customer Phone</th>
+                    <th style="width: 250px;">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Rows.Count > 0)
+                {
+                    @foreach (System.Data.DataRow row in Model.Rows)
+                    {
+                        var id = row["CUSTOMER_ID"].ToString();
+                        var name = row["CUSTOMER_NAME"].ToString();
+                        var address = row["CUSTOMER_ADDRESS"].ToString();
+                        var phone = row["CUSTOMER_PHONE"].ToString();
+
+                        <tr id="viewRow_@id">
+                            <td class="customer-id">@id</td>
+                            <td>@name</td>
+                            <td>@address</td>
+                            <td>@phone</td>
+                            <td>
+                                <div class="action-group">
+                                    <button type="button" class="btn btn-edit btn-sm" onclick="enableEdit('@id')">Edit</button>
+
+                                    <form method="post" asp-action="Delete" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete this customer?');">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="customerId" value="@id" />
+                                        <button type="submit" class="btn btn-delete btn-sm">Delete</button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr id="editRow_@id" class="edit-row" style="display:none;">
+                            <form method="post" asp-action="Update">
+                                @Html.AntiForgeryToken()
+                            <td>
+                                <input type="text" name="customerId" value="@id" class="form-control inline-input" readonly />
+                            </td>
+                            <td>
+                                <input type="text" name="customerName" value="@name" class="form-control inline-input" required />
+                            </td>
+                            <td>
+                                <input type="text" name="customerAddress" value="@address" class="form-control inline-input" required />
+                            </td>
+                            <td>
+                                <input type="text" name="customerPhone" value="@phone" class="form-control inline-input" required />
+                            </td>
+                            <td>
+                                <div class="action-group">
+                                    <button type="submit" class="btn btn-save btn-sm">Save</button>
+                                    <button type="button" class="btn btn-cancel btn-sm" onclick="cancelEdit('@id')">Cancel</button>
+                                </div>
+                            </td>
+                            </form>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="5" class="empty-row">No customer records found.</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 </div>
 
-<table class="table table-bordered table-striped">
-    <thead class="table-dark">
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Address</th>
-            <th>Phone</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (System.Data.DataRow row in Model.Rows)
-        {
-            <tr>
-                <td>@row["CUSTOMER_ID"]</td>
-                <td>@row["CUSTOMER_NAME"]</td>
-                <td>@row["CUSTOMER_ADDRESS"]</td>
-                <td>@row["CUSTOMER_PHONE"]</td>
-                <td>
-                    <form method="post" asp-action="Delete" style="display:inline;">
-                        <input type="hidden" name="customerId" value="@row["CUSTOMER_ID"]" />
-                        <button class="btn btn-danger btn-sm">Delete</button>
-                    </form>
+<script>
+    function enableEdit(id) {
+        document.getElementById("viewRow_" + id).style.display = "none";
+        document.getElementById("editRow_" + id).style.display = "";
+    }
 
-                    <form method="post" asp-action="Update" class="mt-2">
-                        <input type="hidden" name="customerId" value="@row["CUSTOMER_ID"]" />
-                        <input name="customerName" value="@row["CUSTOMER_NAME"]" class="form-control form-control-sm mb-1" />
-                        <input name="customerAddress" value="@row["CUSTOMER_ADDRESS"]" class="form-control form-control-sm mb-1" />
-                        <input name="customerPhone" value="@row["CUSTOMER_PHONE"]" class="form-control form-control-sm mb-1" />
-                        <button class="btn btn-primary btn-sm">Save</button>
-                    </form>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    function cancelEdit(id) {
+        document.getElementById("editRow_" + id).style.display = "none";
+        document.getElementById("viewRow_" + id).style.display = "";
+    }
+
+    document.getElementById("customerSearch").addEventListener("keyup", function () {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll("#customerTable tbody tr");
+
+        rows.forEach(row => {
+            let text = row.innerText.toLowerCase();
+            row.style.display = text.includes(filter) ? "" : "none";
+        });
+    });
+</script>
