@@ -1,0 +1,86 @@
+﻿@{
+    ViewData["Title"] = "Reports";
+    var customers = ViewBag.Customers as System.Data.DataTable;
+    var halls = ViewBag.Halls as System.Data.DataTable;
+    var movies = ViewBag.Movies as System.Data.DataTable;
+
+    var r1 = ViewBag.Report1 as System.Data.DataTable;
+    var r2 = ViewBag.Report2 as System.Data.DataTable;
+    var r3 = ViewBag.Report3 as System.Data.DataTable;
+}
+
+<h2>Reports</h2>
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5>Customer Tickets (Last 6 Months)</h5>
+                <form method="post" asp-action="CustomerTickets">
+                    <select class="form-select" name="customerId" required>
+                        <option value="">Select Customer</option>
+                        @foreach (System.Data.DataRow c in customers.Rows)
+                        {
+                            <option value="@c["CUSTOMER_ID"]">@c["CUSTOMER_ID"] - @c["CUSTOMER_NAME"]</option>
+                        }
+                    </select>
+                    <button class="btn btn-primary mt-2">Generate</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5>Theatre Hall Shows</h5>
+                <form method="post" asp-action="HallShows">
+                    <select class="form-select" name="hallId" required>
+                        <option value="">Select Hall</option>
+                        @foreach (System.Data.DataRow h in halls.Rows)
+                        {
+                            <option value="@h["HALL_ID"]">@h["HALL_ID"] - @h["HALL_NAME"] (@h["THEATRE_NAME"])</option>
+                        }
+                    </select>
+                    <button class="btn btn-primary mt-2">Generate</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <h5>Top 3 Occupancy</h5>
+                <form method="post" asp-action="Top3Occupancy">
+                    <select class="form-select" name="movieId" required>
+                        <option value="">Select Movie</option>
+                        @foreach (System.Data.DataRow m in movies.Rows)
+                        {
+                            <option value="@m["MOVIE_ID"]">@m["MOVIE_ID"] - @m["MOVIE_TITLE"]</option>
+                        }
+                    </select>
+                    <button class="btn btn-primary mt-2">Generate</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<hr class="my-4" />
+
+@if (r1 != null)
+{
+    <h4>Report 1 Result</h4>
+    @await Html.PartialAsync("_DataTable", r1)
+}
+@if (r2 != null)
+{
+    <h4>Report 2 Result</h4>
+    @await Html.PartialAsync("_DataTable", r2)
+}
+@if (r3 != null)
+{
+    <h4>Report 3 Result</h4>
+    @await Html.PartialAsync("_DataTable", r3)
+}

@@ -1,0 +1,55 @@
+﻿@model System.Data.DataTable
+@{
+    ViewData["Title"] = "Customers";
+}
+
+<h2>Customer Details</h2>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="post" asp-action="Create" class="row g-2">
+            <div class="col-md-2"><input class="form-control" name="customerId" placeholder="Customer ID" required /></div>
+            <div class="col-md-3"><input class="form-control" name="customerName" placeholder="Customer Name" required /></div>
+            <div class="col-md-4"><input class="form-control" name="customerAddress" placeholder="Customer Address" required /></div>
+            <div class="col-md-3"><input class="form-control" name="customerPhone" placeholder="Customer Phone" required /></div>
+            <div class="col-12"><button class="btn btn-success" type="submit">Add Customer</button></div>
+        </form>
+    </div>
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Address</th>
+            <th>Phone</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (System.Data.DataRow row in Model.Rows)
+        {
+            <tr>
+                <td>@row["CUSTOMER_ID"]</td>
+                <td>@row["CUSTOMER_NAME"]</td>
+                <td>@row["CUSTOMER_ADDRESS"]</td>
+                <td>@row["CUSTOMER_PHONE"]</td>
+                <td>
+                    <form method="post" asp-action="Delete" style="display:inline;">
+                        <input type="hidden" name="customerId" value="@row["CUSTOMER_ID"]" />
+                        <button class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+
+                    <form method="post" asp-action="Update" class="mt-2">
+                        <input type="hidden" name="customerId" value="@row["CUSTOMER_ID"]" />
+                        <input name="customerName" value="@row["CUSTOMER_NAME"]" class="form-control form-control-sm mb-1" />
+                        <input name="customerAddress" value="@row["CUSTOMER_ADDRESS"]" class="form-control form-control-sm mb-1" />
+                        <input name="customerPhone" value="@row["CUSTOMER_PHONE"]" class="form-control form-control-sm mb-1" />
+                        <button class="btn btn-primary btn-sm">Save</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

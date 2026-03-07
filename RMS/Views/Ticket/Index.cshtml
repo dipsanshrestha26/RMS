@@ -1,0 +1,129 @@
+﻿@model System.Data.DataTable
+@{
+    ViewData["Title"] = "Tickets";
+    var customers = ViewBag.Customers as System.Data.DataTable;
+    var shows = ViewBag.Shows as System.Data.DataTable;
+    var seats = ViewBag.Seats as List<string>;
+    string selectedShowId = ViewBag.SelectedShowId as string ?? "";
+}
+
+<h2>Ticket Details</h2>
+
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">@TempData["Success"]</div>
+}
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="post" asp-action="Create" class="row g-2">
+            <div class="col-md-2">
+                <input class="form-control" name="ticketId" placeholder="Ticket ID" required />
+            </div>
+
+            <div class="col-md-3">
+                <select class="form-select" name="showId" onchange="window.location='@Url.Action("Index", "Ticket")?showId=' + this.value" required>
+                    <option value="">Select Show</option>
+                    @foreach (System.Data.DataRow s in shows.Rows)
+                    {
+                        var sid = s["SHOW_ID"].ToString();
+                        if (sid == selectedShowId)
+                        {
+                            <option value="@sid" selected>@s["SHOW_ID"] - @s["MOVIE_TITLE"]</option>
+                        }
+                        else
+                        {
+                            <option value="@sid">@s["SHOW_ID"] - @s["MOVIE_TITLE"]</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-3">
+                <select class="form-select" name="customerId" required>
+                    <option value="">Select Customer</option>
+                    @foreach (System.Data.DataRow c in customers.Rows)
+                    {
+                        <option value="@c["CUSTOMER_ID"]">@c["CUSTOMER_ID"] - @c["CUSTOMER_NAME"]</option>
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <select class="form-select" name="seatNumber" required>
+                    <option value="">Select Seat</option>
+                    @if (seats != null)
+                    {
+                        foreach (var seat in seats)
+                        {
+                            <option value="@seat">@seat</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="col-md-2">
+                <input type="datetime-local" class="form-control" name="bookingDatetime"
+                       value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" required />
+            </div>
+
+            <div class="col-md-2">
+                <select class="form-select" name="ticketStatus" required>
+                    <option value="">Status</option>
+                    <option>Booked</option>
+                    <option>Cancelled</option>
+                    <option>Pending</option>
+                </select>
+            </div>
+
+            <div class="col-12">
+                <button class="btn btn-success" type="submit">Add Ticket</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(selectedShowId) && seats != null)
+{
+    <div class="alert alert-info">
+        Available seats for show <strong>@selectedShowId</strong>: @string.Join(", ", seats)
+    </div>
+}
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Show</th>
+            <th>Customer</th>
+            <th>Seat</th>
+            <th>Booking Datetime</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (System.Data.DataRow row in Model.Rows)
+        {
+            <tr>
+                <td>@row["TICKET_ID"]</td>
+                <td>@row["SHOW_ID"]</td>
+                <td>@row["CUSTOMER_NAME"]</td>
+                <td>@row["SEAT_NUMBER"]</td>
+                <td>@row["BOOKING_DATETIME"]</td>
+                <td>@row["TICKET_STATUS"]</td>
+                <td>
+                    <form method="post" asp-action="Delete" style="display:inline;">
+                        <input type="hidden" name="ticketId" value="@row["TICKET_ID"]" />
+                        <button class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

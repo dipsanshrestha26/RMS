@@ -1,0 +1,51 @@
+﻿@model System.Data.DataTable
+@{
+    ViewData["Title"] = "Theatres";
+}
+
+<h2>Theatre Details</h2>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="post" asp-action="Create" class="row g-2">
+            <div class="col-md-3"><input class="form-control" name="theatreId" placeholder="Theatre ID" required /></div>
+            <div class="col-md-4"><input class="form-control" name="theatreName" placeholder="Theatre Name" required /></div>
+            <div class="col-md-3"><input class="form-control" name="theatreCity" placeholder="Theatre City" required /></div>
+            <div class="col-12"><button class="btn btn-success" type="submit">Add Theatre</button></div>
+        </form>
+    </div>
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>City</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (System.Data.DataRow row in Model.Rows)
+        {
+            <tr>
+                <td>@row["THEATRE_ID"]</td>
+                <td>@row["THEATRE_NAME"]</td>
+                <td>@row["THEATRE_CITY"]</td>
+                <td>
+                    <form method="post" asp-action="Delete" style="display:inline;">
+                        <input type="hidden" name="theatreId" value="@row["THEATRE_ID"]" />
+                        <button class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+
+                    <form method="post" asp-action="Update" class="mt-2">
+                        <input type="hidden" name="theatreId" value="@row["THEATRE_ID"]" />
+                        <input name="theatreName" value="@row["THEATRE_NAME"]" class="form-control form-control-sm mb-1" />
+                        <input name="theatreCity" value="@row["THEATRE_CITY"]" class="form-control form-control-sm mb-1" />
+                        <button class="btn btn-primary btn-sm">Save</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

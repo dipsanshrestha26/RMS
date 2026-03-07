@@ -1,0 +1,71 @@
+﻿@model System.Data.DataTable
+@{
+    ViewData["Title"] = "Shows";
+    var movies = ViewBag.Movies as System.Data.DataTable;
+    var halls = ViewBag.Halls as System.Data.DataTable;
+}
+
+<h2>Show Details</h2>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="post" asp-action="Create" class="row g-2">
+            <div class="col-md-2"><input class="form-control" name="showId" placeholder="Show ID" required /></div>
+            <div class="col-md-3">
+                <select class="form-select" name="movieId" required>
+                    <option value="">Select Movie</option>
+                    @foreach (System.Data.DataRow m in movies.Rows)
+                    {
+                        <option value="@m["MOVIE_ID"]">@m["MOVIE_ID"] - @m["MOVIE_TITLE"]</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select class="form-select" name="hallId" required>
+                    <option value="">Select Hall</option>
+                    @foreach (System.Data.DataRow h in halls.Rows)
+                    {
+                        <option value="@h["HALL_ID"]">@h["HALL_ID"] - @h["HALL_NAME"]</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2"><input type="date" class="form-control" name="showDate" required /></div>
+            <div class="col-md-2"><input class="form-control" name="showTime" placeholder="Show Time" required /></div>
+            <div class="col-md-2"><input class="form-control" name="baseTicketPrice" type="number" step="0.01" placeholder="Price" required /></div>
+            <div class="col-12"><button class="btn btn-success" type="submit">Add Show</button></div>
+        </form>
+    </div>
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Movie</th>
+            <th>Hall</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Price</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (System.Data.DataRow row in Model.Rows)
+        {
+            <tr>
+                <td>@row["SHOW_ID"]</td>
+                <td>@row["MOVIE_TITLE"]</td>
+                <td>@row["HALL_NAME"]</td>
+                <td>@row["SHOW_DATE"]</td>
+                <td>@row["SHOW_TIME"]</td>
+                <td>@row["BASE_TICKET_PRICE"]</td>
+                <td>
+                    <form method="post" asp-action="Delete" style="display:inline;">
+                        <input type="hidden" name="showId" value="@row["SHOW_ID"]" />
+                        <button class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

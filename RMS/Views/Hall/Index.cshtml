@@ -1,0 +1,70 @@
+﻿@model System.Data.DataTable
+@{
+    ViewData["Title"] = "Halls";
+    var theatres = ViewBag.Theatres as System.Data.DataTable;
+}
+
+<h2>Hall Details</h2>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="post" asp-action="Create" class="row g-2">
+            <div class="col-md-2"><input class="form-control" name="hallId" placeholder="Hall ID" required /></div>
+            <div class="col-md-3">
+                <select class="form-select" name="theatreId" required>
+                    <option value="">Select Theatre</option>
+                    @foreach (System.Data.DataRow t in theatres.Rows)
+                    {
+                        <option value="@t["THEATRE_ID"]">@t["THEATRE_ID"] - @t["THEATRE_NAME"]</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-3"><input class="form-control" name="hallName" placeholder="Hall Name" required /></div>
+            <div class="col-md-2"><input class="form-control" name="seatingCapacity" type="number" placeholder="Capacity" required /></div>
+            <div class="col-12"><button class="btn btn-success" type="submit">Add Hall</button></div>
+        </form>
+    </div>
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Theatre</th>
+            <th>Hall Name</th>
+            <th>Capacity</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (System.Data.DataRow row in Model.Rows)
+        {
+            <tr>
+                <td>@row["HALL_ID"]</td>
+                <td>@row["THEATRE_NAME"]</td>
+                <td>@row["HALL_NAME"]</td>
+                <td>@row["SEATING_CAPACITY"]</td>
+                <td>
+                    <form method="post" asp-action="Delete" style="display:inline;">
+                        <input type="hidden" name="hallId" value="@row["HALL_ID"]" />
+                        <button class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+
+                    <form method="post" asp-action="Update" class="mt-2">
+                        <input type="hidden" name="hallId" value="@row["HALL_ID"]" />
+                        <select class="form-select form-select-sm mb-1" name="theatreId">
+                            @foreach (System.Data.DataRow t in theatres.Rows)
+                            {
+                                var selected = t["THEATRE_ID"].ToString() == row["THEATRE_ID"].ToString();
+                                <option value="@t["THEATRE_ID"]" selected="@selected">@t["THEATRE_ID"] - @t["THEATRE_NAME"]</option>
+                            }
+                        </select>
+                        <input name="hallName" value="@row["HALL_NAME"]" class="form-control form-control-sm mb-1" />
+                        <input name="seatingCapacity" value="@row["SEATING_CAPACITY"]" class="form-control form-control-sm mb-1" />
+                        <button class="btn btn-primary btn-sm">Save</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

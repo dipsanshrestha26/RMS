@@ -1,0 +1,62 @@
+﻿@model System.Data.DataTable
+@{
+    ViewData["Title"] = "Payments";
+    var tickets = ViewBag.Tickets as System.Data.DataTable;
+}
+
+<h2>Payment Details</h2>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <form method="post" asp-action="Create" class="row g-2">
+            <div class="col-md-2"><input class="form-control" name="paymentId" placeholder="Payment ID" required /></div>
+            <div class="col-md-2">
+                <select class="form-select" name="ticketId" required>
+                    <option value="">Select Ticket</option>
+                    @foreach (System.Data.DataRow t in tickets.Rows)
+                    {
+                        <option value="@t["TICKET_ID"]">@t["TICKET_ID"]</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2"><input class="form-control" name="paymentMode" placeholder="Payment Mode" required /></div>
+            <div class="col-md-2"><input type="date" class="form-control" name="paymentDate" required /></div>
+            <div class="col-md-2"><input class="form-control" name="amountPaid" type="number" step="0.01" placeholder="Amount" required /></div>
+            <div class="col-md-2"><input class="form-control" name="paymentStatus" placeholder="Status" required /></div>
+            <div class="col-12"><button class="btn btn-success" type="submit">Add Payment</button></div>
+        </form>
+    </div>
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Ticket</th>
+            <th>Mode</th>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (System.Data.DataRow row in Model.Rows)
+        {
+            <tr>
+                <td>@row["PAYMENT_ID"]</td>
+                <td>@row["TICKET_ID"]</td>
+                <td>@row["PAYMENT_MODE"]</td>
+                <td>@row["PAYMENT_DATE"]</td>
+                <td>@row["AMOUNT_PAID"]</td>
+                <td>@row["PAYMENT_STATUS"]</td>
+                <td>
+                    <form method="post" asp-action="Delete" style="display:inline;">
+                        <input type="hidden" name="paymentId" value="@row["PAYMENT_ID"]" />
+                        <button class="btn btn-danger btn-sm">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
