@@ -2,6 +2,7 @@
 using Oracle.ManagedDataAccess.Client;
 using RMS.Data;
 using System;
+using System.Data;
 
 namespace RMS.Controllers
 {
@@ -35,6 +36,7 @@ namespace RMS.Controllers
                        m.MOVIE_TITLE,
                        s.BASE_TICKET_PRICE,
                        s.SHOW_DATE,
+                       s.SHOW_TIME,
                        t.BOOKING_DATETIME
                 FROM TICKET_3NF t
                 JOIN CUSTOMER_3NF c ON c.CUSTOMER_ID = t.CUSTOMER_ID
@@ -53,7 +55,7 @@ namespace RMS.Controllers
                 WHERE t.TICKET_ID = :TICKET_ID
             ", new OracleParameter("TICKET_ID", ticketId));
 
-            if (amountObj == null)
+            if (amountObj == null || amountObj == DBNull.Value)
                 return 0;
 
             return Convert.ToDecimal(amountObj);
@@ -73,19 +75,30 @@ namespace RMS.Controllers
             return Convert.ToDateTime(obj);
         }
 
-        private DateTime? GetShowDate(string ticketId)
+        private DateTime? GetShowDateTime(string ticketId)
         {
-            var obj = _db.Scalar(@"
-                SELECT s.SHOW_DATE
+            var dt = _db.Query(@"
+                SELECT s.SHOW_DATE, s.SHOW_TIME
                 FROM TICKET_3NF t
                 JOIN SHOW_3NF s ON s.SHOW_ID = t.SHOW_ID
                 WHERE t.TICKET_ID = :TICKET_ID
             ", new OracleParameter("TICKET_ID", ticketId));
 
-            if (obj == null || obj == DBNull.Value)
+            if (dt.Rows.Count == 0)
                 return null;
 
-            return Convert.ToDateTime(obj);
+            DateTime showDate = Convert.ToDateTime(dt.Rows[0]["SHOW_DATE"]);
+            string showTime = dt.Rows[0]["SHOW_TIME"]?.ToString() ?? "00:00";
+
+            if (!TimeSpan.TryParse(showTime, out TimeSpan timePart))
+            {
+                if (!TimeSpan.TryParse(showTime + ":00", out timePart))
+                {
+                    timePart = TimeSpan.Zero;
+                }
+            }
+
+            return showDate.Date.Add(timePart);
         }
 
         private void UpdateTicketStatusBasedOnPayment(string ticketId, string paymentStatus)
@@ -159,29 +172,33 @@ namespace RMS.Controllers
                     return RedirectToAction("Index");
                 }
 
-                DateTime? showDate = GetShowDate(ticketId);
-                if (showDate == null)
-                {
-                    TempData["ErrorMessage"] = "Show date was not found for the selected ticket.";
-                    return RedirectToAction("Index");
-                }
-
                 DateTime? bookingDateTime = GetTicketBookingDateTime(ticketId);
                 if (bookingDateTime == null)
                 {
-                    TempData["ErrorMessage"] = "Ticket booking date was not found.";
+                    TempData["ErrorMessage"] = "Ticket booking date and time was not found.";
                     return RedirectToAction("Index");
                 }
 
-                if (paymentDate.Date < showDate.Value.Date)
+                DateTime? showDateTime = GetShowDateTime(ticketId);
+                if (showDateTime == null)
                 {
-                    TempData["ErrorMessage"] = $"Payment date cannot be before the show date ({showDate.Value:dd/MM/yyyy}).";
+                    TempData["ErrorMessage"] = "Show date and time was not found for the selected ticket.";
                     return RedirectToAction("Index");
                 }
 
-                if (paymentDate.Date < bookingDateTime.Value.Date)
+                if (paymentDate < bookingDateTime.Value)
                 {
-                    TempData["ErrorMessage"] = $"Payment date cannot be before the ticket booking date ({bookingDateTime.Value:dd/MM/yyyy}).";
+                    TempData["ErrorMessage"] =
+                        $"Payment cannot be made before ticket booking time. " +
+                        $"Ticket was booked on {bookingDateTime.Value:dd/MM/yyyy hh:mm tt}.";
+                    return RedirectToAction("Index");
+                }
+
+                if (paymentDate > showDateTime.Value)
+                {
+                    TempData["ErrorMessage"] =
+                        $"Payment must be completed before the show starts. " +
+                        $"Ticket booked on {bookingDateTime.Value:dd/MM/yyyy hh:mm tt} and show starts on {showDateTime.Value:dd/MM/yyyy hh:mm tt}.";
                     return RedirectToAction("Index");
                 }
 
@@ -229,29 +246,33 @@ namespace RMS.Controllers
                     return RedirectToAction("Index");
                 }
 
-                DateTime? showDate = GetShowDate(ticketId);
-                if (showDate == null)
-                {
-                    TempData["ErrorMessage"] = "Show date was not found for the selected ticket.";
-                    return RedirectToAction("Index");
-                }
-
                 DateTime? bookingDateTime = GetTicketBookingDateTime(ticketId);
                 if (bookingDateTime == null)
                 {
-                    TempData["ErrorMessage"] = "Ticket booking date was not found.";
+                    TempData["ErrorMessage"] = "Ticket booking date and time was not found.";
                     return RedirectToAction("Index");
                 }
 
-                if (paymentDate.Date < showDate.Value.Date)
+                DateTime? showDateTime = GetShowDateTime(ticketId);
+                if (showDateTime == null)
                 {
-                    TempData["ErrorMessage"] = $"Payment date cannot be before the show date ({showDate.Value:dd/MM/yyyy}).";
+                    TempData["ErrorMessage"] = "Show date and time was not found for the selected ticket.";
                     return RedirectToAction("Index");
                 }
 
-                if (paymentDate.Date < bookingDateTime.Value.Date)
+                if (paymentDate < bookingDateTime.Value)
                 {
-                    TempData["ErrorMessage"] = $"Payment date cannot be before the ticket booking date ({bookingDateTime.Value:dd/MM/yyyy}).";
+                    TempData["ErrorMessage"] =
+                        $"Payment cannot be made before ticket booking time. " +
+                        $"Ticket was booked on {bookingDateTime.Value:dd/MM/yyyy hh:mm tt}.";
+                    return RedirectToAction("Index");
+                }
+
+                if (paymentDate > showDateTime.Value)
+                {
+                    TempData["ErrorMessage"] =
+                        $"Payment must be completed before the show starts. " +
+                        $"Ticket booked on {bookingDateTime.Value:dd/MM/yyyy hh:mm tt} and show starts on {showDateTime.Value:dd/MM/yyyy hh:mm tt}.";
                     return RedirectToAction("Index");
                 }
 

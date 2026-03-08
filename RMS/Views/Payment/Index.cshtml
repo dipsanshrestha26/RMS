@@ -230,6 +230,10 @@
 <div class="page-shell">
     <div class="page-header">
         <h2>Payment Management</h2>
+        <p>
+            Payment amount must match the ticket price.
+            Payment must be completed after ticket booking time and before the show starts.
+        </p>
     </div>
 
     @if (TempData["SuccessMessage"] != null)
@@ -266,7 +270,9 @@
                         <option value="">Select Ticket</option>
                         @foreach (System.Data.DataRow t in tickets.Rows)
                         {
-                            <option value="@t["TICKET_ID"]">@t["TICKET_ID"] - @t["MOVIE_TITLE"] - @t["CUSTOMER_NAME"] - Seat @t["SEAT_NUMBER"] - Rs. @t["BASE_TICKET_PRICE"]</option>
+                            <option value="@t["TICKET_ID"]">
+                                @t["TICKET_ID"] - @t["MOVIE_TITLE"] - @t["CUSTOMER_NAME"] - Seat @t["SEAT_NUMBER"] - Rs. @t["BASE_TICKET_PRICE"]
+                            </option>
                         }
                     </select>
                 </div>
@@ -282,8 +288,12 @@
                 </div>
 
                 <div class="col-md-2">
-                    <label class="form-label">Payment Date</label>
-                    <input type="date" name="paymentDate" class="form-control" required />
+                    <label class="form-label">Payment Date/Time</label>
+                    <input type="datetime-local"
+                           name="paymentDate"
+                           class="form-control"
+                           value="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")"
+                           required />
                 </div>
 
                 <div class="col-md-1">
@@ -320,7 +330,7 @@
                     <th>ID</th>
                     <th>Ticket</th>
                     <th>Mode</th>
-                    <th>Date</th>
+                    <th>Date/Time</th>
                     <th>Amount</th>
                     <th>Status</th>
                     <th style="width:220px;">Actions</th>
@@ -338,8 +348,8 @@
                         var paymentStatus = row["PAYMENT_STATUS"].ToString();
 
                         DateTime paymentDate = Convert.ToDateTime(row["PAYMENT_DATE"]);
-                        string inputDate = paymentDate.ToString("yyyy-MM-dd");
-                        string displayDate = paymentDate.ToString("dd/MM/yyyy");
+                        string inputDate = paymentDate.ToString("yyyy-MM-ddTHH:mm");
+                        string displayDate = paymentDate.ToString("dd/MM/yyyy hh:mm tt");
 
                         <tr id="viewRow_@id">
                             <td>@id</td>
@@ -378,11 +388,15 @@
                                             {
                                                 if (t["TICKET_ID"].ToString() == ticketId)
                                                 {
-                                                    <option value="@t["TICKET_ID"]" selected>@t["TICKET_ID"] - @t["MOVIE_TITLE"] - @t["CUSTOMER_NAME"] - Seat @t["SEAT_NUMBER"] - Rs. @t["BASE_TICKET_PRICE"]</option>
+                                                    <option value="@t["TICKET_ID"]" selected>
+                                                        @t["TICKET_ID"] - @t["MOVIE_TITLE"] - @t["CUSTOMER_NAME"] - Seat @t["SEAT_NUMBER"] - Rs. @t["BASE_TICKET_PRICE"]
+                                                    </option>
                                                 }
                                                 else
                                                 {
-                                                    <option value="@t["TICKET_ID"]">@t["TICKET_ID"] - @t["MOVIE_TITLE"] - @t["CUSTOMER_NAME"] - Seat @t["SEAT_NUMBER"] - Rs. @t["BASE_TICKET_PRICE"]</option>
+                                                    <option value="@t["TICKET_ID"]">
+                                                        @t["TICKET_ID"] - @t["MOVIE_TITLE"] - @t["CUSTOMER_NAME"] - Seat @t["SEAT_NUMBER"] - Rs. @t["BASE_TICKET_PRICE"]
+                                                    </option>
                                                 }
                                             }
                                         </select>
@@ -421,8 +435,8 @@
                                     </div>
 
                                     <div class="col-md-2">
-                                        <label class="form-label">Payment Date</label>
-                                        <input type="date" name="paymentDate" value="@inputDate" class="form-control" required />
+                                        <label class="form-label">Payment Date/Time</label>
+                                        <input type="datetime-local" name="paymentDate" value="@inputDate" class="form-control" required />
                                     </div>
 
                                     <div class="col-md-1">
