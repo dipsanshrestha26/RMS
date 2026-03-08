@@ -47,13 +47,6 @@
             color: var(--text);
         }
 
-        .page-header p {
-            margin: 8px 0 0;
-            color: var(--text-soft);
-            line-height: 1.7;
-            font-size: 15px;
-        }
-
     .panel {
         border-radius: var(--radius);
         margin-bottom: 24px;
@@ -105,13 +98,25 @@
             color: #fff;
         }
 
-    .btn-edit, .btn-cancel {
+    .btn-edit {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+    }
+
+        .btn-edit:hover {
+            background: #dbeafe;
+            color: #1e40af;
+            border-color: #93c5fd;
+        }
+
+    .btn-cancel {
         background: #fff;
         color: #334155;
         border: 1px solid #cbd5e1;
     }
 
-        .btn-edit:hover, .btn-cancel:hover {
+        .btn-cancel:hover {
             background: #f8fafc;
             color: #111827;
         }
@@ -125,6 +130,7 @@
         .btn-delete:hover {
             background: #fef2f2;
             color: #7f1d1d;
+            border-color: #fca5a5;
         }
 
     .utility-bar {
@@ -216,7 +222,6 @@
 <div class="page-shell">
     <div class="page-header">
         <h2>Theatre Management</h2>
-        <p>Add, search, edit, and delete theatre records from one page.</p>
     </div>
 
     @if (TempData["SuccessMessage"] != null)

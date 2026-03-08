@@ -18,6 +18,7 @@
         --text-soft: #6b7280;
         --secondary: #475569;
         --hover: #f9fafb;
+        --edit-bg: #f8fafc;
         --success: #f0fdf4;
         --danger: #fef2f2;
         --info: #eff6ff;
@@ -110,6 +111,18 @@
             color: #fff;
         }
 
+    .btn-edit {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+    }
+
+        .btn-edit:hover {
+            background: #dbeafe;
+            color: #1e40af;
+            border-color: #93c5fd;
+        }
+
     .btn-delete {
         background: #fff;
         color: #7f1d1d;
@@ -119,6 +132,7 @@
         .btn-delete:hover {
             background: #fef2f2;
             color: #7f1d1d;
+            border-color: #fca5a5;
         }
 
     .alert {
@@ -145,6 +159,26 @@
         border-radius: 14px;
         padding: 14px 16px;
         margin-bottom: 20px;
+    }
+
+    .utility-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-bottom: 14px;
+    }
+
+        .utility-bar h4 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 650;
+            color: var(--text);
+        }
+
+    .search-box {
+        max-width: 320px;
     }
 
     .table-panel {
@@ -188,10 +222,6 @@
 <div class="page-shell">
     <div class="page-header">
         <h2>Ticket Management</h2>
-        <p>
-            Create tickets against a specific show. The show dropdown clearly displays movie,
-            theatre, hall, date, and time to avoid user confusion.
-        </p>
     </div>
 
     @if (TempData["SuccessMessage"] != null)
@@ -234,7 +264,6 @@
                             string theatreName = s["THEATRE_NAME"].ToString()!;
                             string showDateText = Convert.ToDateTime(s["SHOW_DATE"]).ToString("dd/MM/yyyy");
                             string showTimeText = s["SHOW_TIME"].ToString()!;
-
                             string label = $"{sid} - {movieTitle} | {theatreName} | {hallName} | {showDateText} {showTimeText}";
 
                             if (sid == selectedShowId)
@@ -284,7 +313,7 @@
                 </div>
 
                 <div class="col-md-2">
-                    <label class="form-label">Ticket Status</label>
+                    <label class="form-label">Status</label>
                     <select class="form-select" name="ticketStatus" required>
                         <option value="">Select Status</option>
                         <option value="Pending">Pending</option>
@@ -315,8 +344,13 @@
         </div>
     }
 
+    <div class="utility-bar">
+        <h4>Ticket Records</h4>
+        <input type="text" id="ticketSearch" class="form-control search-box" placeholder="Search ticket..." />
+    </div>
+
     <div class="table-panel">
-        <table class="table align-middle">
+        <table class="table align-middle" id="ticketTable">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -367,3 +401,15 @@
         </table>
     </div>
 </div>
+
+<script>
+    document.getElementById("ticketSearch").addEventListener("keyup", function () {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll("#ticketTable tbody tr");
+
+        rows.forEach(row => {
+            let text = row.innerText.toLowerCase();
+            row.style.display = text.includes(filter) ? "" : "none";
+        });
+    });
+</script>

@@ -33,7 +33,9 @@ namespace RMS.Controllers
                        t.SEAT_NUMBER,
                        c.CUSTOMER_NAME,
                        m.MOVIE_TITLE,
-                       s.BASE_TICKET_PRICE
+                       s.BASE_TICKET_PRICE,
+                       s.SHOW_DATE,
+                       t.BOOKING_DATETIME
                 FROM TICKET_3NF t
                 JOIN CUSTOMER_3NF c ON c.CUSTOMER_ID = t.CUSTOMER_ID
                 JOIN SHOW_3NF s ON s.SHOW_ID = t.SHOW_ID
@@ -55,6 +57,35 @@ namespace RMS.Controllers
                 return 0;
 
             return Convert.ToDecimal(amountObj);
+        }
+
+        private DateTime? GetTicketBookingDateTime(string ticketId)
+        {
+            var obj = _db.Scalar(@"
+                SELECT BOOKING_DATETIME
+                FROM TICKET_3NF
+                WHERE TICKET_ID = :TICKET_ID
+            ", new OracleParameter("TICKET_ID", ticketId));
+
+            if (obj == null || obj == DBNull.Value)
+                return null;
+
+            return Convert.ToDateTime(obj);
+        }
+
+        private DateTime? GetShowDate(string ticketId)
+        {
+            var obj = _db.Scalar(@"
+                SELECT s.SHOW_DATE
+                FROM TICKET_3NF t
+                JOIN SHOW_3NF s ON s.SHOW_ID = t.SHOW_ID
+                WHERE t.TICKET_ID = :TICKET_ID
+            ", new OracleParameter("TICKET_ID", ticketId));
+
+            if (obj == null || obj == DBNull.Value)
+                return null;
+
+            return Convert.ToDateTime(obj);
         }
 
         private void UpdateTicketStatusBasedOnPayment(string ticketId, string paymentStatus)
@@ -116,7 +147,6 @@ namespace RMS.Controllers
                 }
 
                 decimal expectedAmount = GetExpectedAmount(ticketId);
-
                 if (expectedAmount <= 0)
                 {
                     TempData["ErrorMessage"] = "Invalid ticket selected.";
@@ -126,6 +156,32 @@ namespace RMS.Controllers
                 if (amountPaid != expectedAmount)
                 {
                     TempData["ErrorMessage"] = $"Amount paid must be equal to the ticket price. Expected amount is {expectedAmount}.";
+                    return RedirectToAction("Index");
+                }
+
+                DateTime? showDate = GetShowDate(ticketId);
+                if (showDate == null)
+                {
+                    TempData["ErrorMessage"] = "Show date was not found for the selected ticket.";
+                    return RedirectToAction("Index");
+                }
+
+                DateTime? bookingDateTime = GetTicketBookingDateTime(ticketId);
+                if (bookingDateTime == null)
+                {
+                    TempData["ErrorMessage"] = "Ticket booking date was not found.";
+                    return RedirectToAction("Index");
+                }
+
+                if (paymentDate.Date < showDate.Value.Date)
+                {
+                    TempData["ErrorMessage"] = $"Payment date cannot be before the show date ({showDate.Value:dd/MM/yyyy}).";
+                    return RedirectToAction("Index");
+                }
+
+                if (paymentDate.Date < bookingDateTime.Value.Date)
+                {
+                    TempData["ErrorMessage"] = $"Payment date cannot be before the ticket booking date ({bookingDateTime.Value:dd/MM/yyyy}).";
                     return RedirectToAction("Index");
                 }
 
@@ -161,7 +217,6 @@ namespace RMS.Controllers
             try
             {
                 decimal expectedAmount = GetExpectedAmount(ticketId);
-
                 if (expectedAmount <= 0)
                 {
                     TempData["ErrorMessage"] = "Invalid ticket selected.";
@@ -171,6 +226,32 @@ namespace RMS.Controllers
                 if (amountPaid != expectedAmount)
                 {
                     TempData["ErrorMessage"] = $"Amount paid must be equal to the ticket price. Expected amount is {expectedAmount}.";
+                    return RedirectToAction("Index");
+                }
+
+                DateTime? showDate = GetShowDate(ticketId);
+                if (showDate == null)
+                {
+                    TempData["ErrorMessage"] = "Show date was not found for the selected ticket.";
+                    return RedirectToAction("Index");
+                }
+
+                DateTime? bookingDateTime = GetTicketBookingDateTime(ticketId);
+                if (bookingDateTime == null)
+                {
+                    TempData["ErrorMessage"] = "Ticket booking date was not found.";
+                    return RedirectToAction("Index");
+                }
+
+                if (paymentDate.Date < showDate.Value.Date)
+                {
+                    TempData["ErrorMessage"] = $"Payment date cannot be before the show date ({showDate.Value:dd/MM/yyyy}).";
+                    return RedirectToAction("Index");
+                }
+
+                if (paymentDate.Date < bookingDateTime.Value.Date)
+                {
+                    TempData["ErrorMessage"] = $"Payment date cannot be before the ticket booking date ({bookingDateTime.Value:dd/MM/yyyy}).";
                     return RedirectToAction("Index");
                 }
 

@@ -44,6 +44,20 @@ namespace RMS.Controllers
             return Convert.ToInt32(dt.Rows[0][0]) > 0;
         }
 
+        private DateTime? GetMovieReleaseDate(string movieId)
+        {
+            var obj = _db.Scalar(@"
+                SELECT RELEASE_DATE
+                FROM MOVIE_3NF
+                WHERE MOVIE_ID = :MOVIE_ID
+            ", new OracleParameter("MOVIE_ID", movieId));
+
+            if (obj == null || obj == DBNull.Value)
+                return null;
+
+            return Convert.ToDateTime(obj);
+        }
+
         public IActionResult Index()
         {
             ViewBag.Movies = _db.Query(@"
@@ -85,6 +99,20 @@ namespace RMS.Controllers
         {
             try
             {
+                DateTime? releaseDate = GetMovieReleaseDate(movieId);
+
+                if (releaseDate == null)
+                {
+                    TempData["ErrorMessage"] = "Selected movie was not found.";
+                    return RedirectToAction("Index");
+                }
+
+                if (showDate.Date < releaseDate.Value.Date)
+                {
+                    TempData["ErrorMessage"] = $"Show date cannot be before the movie release date ({releaseDate.Value:dd/MM/yyyy}).";
+                    return RedirectToAction("Index");
+                }
+
                 if (ShowExists(hallId, showDate, showTime))
                 {
                     TempData["ErrorMessage"] = "Another show already exists in the same hall at the same date and time.";
@@ -120,6 +148,20 @@ namespace RMS.Controllers
         {
             try
             {
+                DateTime? releaseDate = GetMovieReleaseDate(movieId);
+
+                if (releaseDate == null)
+                {
+                    TempData["ErrorMessage"] = "Selected movie was not found.";
+                    return RedirectToAction("Index");
+                }
+
+                if (showDate.Date < releaseDate.Value.Date)
+                {
+                    TempData["ErrorMessage"] = $"Show date cannot be before the movie release date ({releaseDate.Value:dd/MM/yyyy}).";
+                    return RedirectToAction("Index");
+                }
+
                 if (ShowExists(hallId, showDate, showTime, showId))
                 {
                     TempData["ErrorMessage"] = "Another show already exists in the same hall at the same date and time.";

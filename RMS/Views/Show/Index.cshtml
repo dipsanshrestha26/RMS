@@ -108,13 +108,25 @@
             color: #fff;
         }
 
-    .btn-edit, .btn-cancel {
+    .btn-edit {
+        background: #eff6ff;
+        color: #1d4ed8;
+        border: 1px solid #bfdbfe;
+    }
+
+        .btn-edit:hover {
+            background: #dbeafe;
+            color: #1e40af;
+            border-color: #93c5fd;
+        }
+
+    .btn-cancel {
         background: #fff;
         color: #334155;
         border: 1px solid #cbd5e1;
     }
 
-        .btn-edit:hover, .btn-cancel:hover {
+        .btn-cancel:hover {
             background: #f8fafc;
             color: #111827;
         }
@@ -128,6 +140,7 @@
         .btn-delete:hover {
             background: #fef2f2;
             color: #7f1d1d;
+            border-color: #fca5a5;
         }
 
     .utility-bar {
@@ -167,8 +180,6 @@
             font-size: 14px;
             padding: 14px 16px;
             border: none;
-            text-transform: none;
-            letter-spacing: 0;
             vertical-align: middle;
             white-space: nowrap;
         }
@@ -216,57 +227,11 @@
         color: var(--text-soft);
         padding: 24px !important;
     }
-
-    .col-show-id {
-        width: 110px;
-    }
-
-    .col-movie {
-        width: 220px;
-    }
-
-    .col-hall {
-        width: 220px;
-    }
-
-    .col-date {
-        width: 140px;
-    }
-
-    .col-time {
-        width: 120px;
-        white-space: nowrap;
-    }
-
-    .col-price {
-        width: 120px;
-        white-space: nowrap;
-    }
-
-    .col-actions {
-        width: 180px;
-    }
-
-    .time-input {
-        min-width: 120px;
-    }
-
-    .price-input {
-        min-width: 110px;
-    }
-
-    .date-input {
-        min-width: 140px;
-    }
 </style>
 
 <div class="page-shell">
     <div class="page-header">
         <h2>Show Management</h2>
-        <p>
-            Add, search, edit, and delete show schedules from one page.
-            A show cannot be duplicated in the same hall at the same date and time.
-        </p>
     </div>
 
     @if (TempData["SuccessMessage"] != null)
@@ -321,17 +286,17 @@
 
                 <div class="col-md-2">
                     <label class="form-label">Date</label>
-                    <input type="date" name="showDate" class="form-control date-input" required />
+                    <input type="date" name="showDate" class="form-control" required />
                 </div>
 
                 <div class="col-md-1">
                     <label class="form-label">Time</label>
-                    <input type="time" name="showTime" class="form-control time-input" required />
+                    <input type="time" name="showTime" class="form-control" required />
                 </div>
 
                 <div class="col-md-1">
                     <label class="form-label">Price</label>
-                    <input type="number" step="0.01" name="baseTicketPrice" class="form-control price-input" required />
+                    <input type="number" step="0.01" name="baseTicketPrice" class="form-control" required />
                 </div>
 
                 <div class="col-12">
@@ -350,13 +315,13 @@
         <table class="table align-middle" id="showTable">
             <thead>
                 <tr>
-                    <th class="col-show-id">ID</th>
-                    <th class="col-movie">Movie</th>
-                    <th class="col-hall">Hall</th>
-                    <th class="col-date">Date</th>
-                    <th class="col-time">Time</th>
-                    <th class="col-price">Price</th>
-                    <th class="col-actions">Actions</th>
+                    <th>ID</th>
+                    <th>Movie</th>
+                    <th>Hall</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Price</th>
+                    <th style="width:250px;">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -382,8 +347,8 @@
                             <td>@movieTitle</td>
                             <td>@hallName (@theatreName)</td>
                             <td>@displayDate</td>
-                            <td class="col-time">@showTime</td>
-                            <td class="col-price">@price</td>
+                            <td>@showTime</td>
+                            <td>@price</td>
                             <td>
                                 <div class="action-group">
                                     <button type="button" class="btn btn-edit btn-sm" onclick="enableEdit('@id')">Edit</button>
@@ -443,17 +408,17 @@
 
                                     <div class="col-md-2">
                                         <label class="form-label">Date</label>
-                                        <input type="date" name="showDate" value="@inputDate" class="form-control date-input" required />
+                                        <input type="date" name="showDate" value="@inputDate" class="form-control" required />
                                     </div>
 
                                     <div class="col-md-1">
                                         <label class="form-label">Time</label>
-                                        <input type="time" name="showTime" value="@showTime" class="form-control time-input" required />
+                                        <input type="time" name="showTime" value="@showTime" class="form-control" required />
                                     </div>
 
                                     <div class="col-md-1">
                                         <label class="form-label">Price</label>
-                                        <input type="number" step="0.01" name="baseTicketPrice" value="@price" class="form-control price-input" required />
+                                        <input type="number" step="0.01" name="baseTicketPrice" value="@price" class="form-control" required />
                                     </div>
 
                                     <div class="col-12">

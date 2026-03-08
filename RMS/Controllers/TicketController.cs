@@ -120,6 +120,46 @@ namespace RMS.Controllers
             return Convert.ToInt32(count) > 0;
         }
 
+        private DateTime? GetShowDate(string showId)
+        {
+            var obj = _db.Scalar(@"
+                SELECT SHOW_DATE
+                FROM SHOW_3NF
+                WHERE SHOW_ID = :SHOW_ID
+            ", new OracleParameter("SHOW_ID", showId));
+
+            if (obj == null || obj == DBNull.Value)
+                return null;
+
+            return Convert.ToDateTime(obj);
+        }
+
+        private DateTime? GetShowDateTime(string showId)
+        {
+            var dt = _db.Query(@"
+                SELECT SHOW_DATE, SHOW_TIME
+                FROM SHOW_3NF
+                WHERE SHOW_ID = :SHOW_ID
+            ", new OracleParameter("SHOW_ID", showId));
+
+            if (dt.Rows.Count == 0)
+                return null;
+
+            DateTime showDate = Convert.ToDateTime(dt.Rows[0]["SHOW_DATE"]);
+            string showTime = dt.Rows[0]["SHOW_TIME"].ToString() ?? "00:00";
+
+            TimeSpan timePart;
+            if (!TimeSpan.TryParse(showTime, out timePart))
+            {
+                if (!TimeSpan.TryParse(showTime + ":00", out timePart))
+                {
+                    timePart = TimeSpan.Zero;
+                }
+            }
+
+            return showDate.Date.Add(timePart);
+        }
+
         public IActionResult Index(string? showId)
         {
             LoadDropdowns(showId);
@@ -158,6 +198,32 @@ namespace RMS.Controllers
                 if (TicketIdExists(ticketId))
                 {
                     TempData["ErrorMessage"] = "Ticket ID already exists.";
+                    return RedirectToAction("Index", new { showId });
+                }
+
+                DateTime? showDate = GetShowDate(showId);
+                if (showDate == null)
+                {
+                    TempData["ErrorMessage"] = "Selected show was not found.";
+                    return RedirectToAction("Index", new { showId });
+                }
+
+                DateTime? showDateTime = GetShowDateTime(showId);
+                if (showDateTime == null)
+                {
+                    TempData["ErrorMessage"] = "Selected show date or time is invalid.";
+                    return RedirectToAction("Index", new { showId });
+                }
+
+                if (bookingDatetime.Date < showDate.Value.Date)
+                {
+                    TempData["ErrorMessage"] = $"Ticket booking date cannot be before the show date ({showDate.Value:dd/MM/yyyy}).";
+                    return RedirectToAction("Index", new { showId });
+                }
+
+                if (bookingDatetime > showDateTime.Value)
+                {
+                    TempData["ErrorMessage"] = "Ticket booking date and time cannot be after the show date and time.";
                     return RedirectToAction("Index", new { showId });
                 }
 
